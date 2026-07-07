@@ -39,3 +39,17 @@ xls = pd.ExcelFile(uploaded_file)
 
 df_2009 = pd.read_excel(xls, sheet_name="Year 2009-2010")
 df_2010 = pd.read_excel(xls, sheet_name="Year 2010-2011")
+# --------------------------------------------------
+# REPORTING PERIOD FILTER
+# --------------------------------------------------
+st.sidebar.header("📅 Reporting Period")
+selected_period = st.sidebar.selectbox(
+    "Select Reporting Period",
+    ["Both Years", "Year 2009-2010", "Year 2010-2011"]
+)
+if selected_period == "Both Years":
+    df = pd.concat([df_2009, df_2010], ignore_index=True)
+elif selected_period == "Year 2009-2010":
+    df = df_2009.copy()
+else:
+    df = df_2010.copy()
