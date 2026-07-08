@@ -315,7 +315,7 @@ Revenue: **£{best_month['Revenue']:,.2f}**
 Revenue: **£{worst_month['Revenue']:,.2f}**
 """
         )
-        
+
 
     st.markdown("---")
     st.subheader("🏆 Best & Worst Performing Month")
@@ -426,3 +426,39 @@ with tab2:
 
 
     st.markdown("---")
+
+    # --------------------------------------------------
+    # TOP 10 PRODUCTS
+    # --------------------------------------------------
+
+    top_products = (
+        df_clean[df_clean["Description"] != "Unknown"]
+        .groupby("Description")["Revenue"]
+        .sum()
+        .sort_values(ascending=False)
+        .head(10)
+    )
+
+
+    st.subheader("🏆 Top 10 Products by Revenue")
+
+
+    fig, ax = plt.subplots(figsize=(12,6))
+
+
+    sns.barplot(
+        x=top_products.values,
+        y=top_products.index,
+        color="#ff7f0e",
+        ax=ax
+    )
+
+
+    fig.tight_layout()
+
+    ax.set_title("Top 10 Products by Revenue")
+    ax.set_xlabel("Revenue (£)")
+    ax.set_ylabel("Product")
+
+
+    st.pyplot(fig)
