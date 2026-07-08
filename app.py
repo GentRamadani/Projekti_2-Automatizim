@@ -500,3 +500,45 @@ with tab2:
 
 
     st.pyplot(fig)
+
+# --------------------------------------------------
+# COUNTRIES
+# --------------------------------------------------
+with tab3:
+    top_countries = (
+        df_clean.groupby("Country")["Revenue"]
+        .sum()
+        .sort_values(ascending=False)
+        .head(10)
+    )
+    st.subheader("🌍 Top 10 Countries by Revenue")
+    fig, ax = plt.subplots(figsize=(12,6))
+    sns.barplot(
+        x=top_countries.values,
+        y=top_countries.index,
+        color="#2ca02c",
+        ax=ax
+    )
+    fig.tight_layout()
+    ax.set_title("Top 10 Countries by Revenue")
+    ax.set_xlabel("Revenue (£)")
+    ax.set_ylabel("Country")
+    st.pyplot(fig)
+    # --------------------------------------------------
+    # Country Performance Table
+    # --------------------------------------------------
+    country_analysis = (
+        df_clean.groupby("Country")
+        .agg(
+            Revenue=("Revenue","sum"),
+            Orders=("Invoice","nunique"),
+            Customers=("Customer ID","nunique")
+        )
+        .sort_values(
+            by="Revenue",
+            ascending=False
+        )
+    )
+    st.markdown("---")
+    st.subheader("📊 Country Performance Table")
+    st.dataframe(country_analysis.head(10))
