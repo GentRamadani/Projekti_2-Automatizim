@@ -163,6 +163,7 @@ tab1, tab2, tab3 = st.tabs([
     "📅 Monthly",
     "📦 Products",
     "🌍 Countries"
+    "⚠️ Outliers"
 ])
 # --------------------------------------------------
 # MONTHLY ANALYSIS
@@ -542,3 +543,51 @@ with tab3:
     st.markdown("---")
     st.subheader("📊 Country Performance Table")
     st.dataframe(country_analysis.head(10))
+
+# --------------------------------------------------
+# OUTLIER ANALYSIS
+# --------------------------------------------------
+
+with tab4:
+
+    st.subheader("⚠️ Outlier Analysis - Large Orders")
+
+    invoice_revenue = (
+        df_clean.groupby("Invoice")
+        .agg(
+            Revenue=("Revenue", "sum"),
+            Products=("Quantity", "sum"),
+            Date=("InvoiceDate", "min")
+        )
+        .reset_index()
+    )
+
+    Q1 = invoice_revenue["Revenue"].quantile(0.25)
+    Q3 = invoice_revenue["Revenue"].quantile(0.75)
+    IQR = Q3 - Q1
+
+    upper_limit = Q3 + 1.5 * IQR
+
+    outliers = invoice_revenue[
+        invoice_revenue["Revenue"] > upper_limit
+    ].sort_values("Revenue", ascending=False)
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.metric("Q1", f"£{Q1:,.2f}")
+
+    with col2:
+        st.metric("Q3", f"£{Q3:,.2f}")
+
+    with col3:
+        st.metric("IQR", f"£{IQR:,.2f}")
+
+    with col4:
+        st.metric("Extreme Orders", f"{len(outliers):,}")
+
+    st.write("""
+These are unusually large orders. They are not removed from the dataset, but analyzed separately because they can strongly affect monthly revenue.
+""")
+
+    st.dataframe(outliers.head(5))
