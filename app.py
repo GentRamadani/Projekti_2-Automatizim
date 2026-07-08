@@ -158,3 +158,71 @@ with col5:
     else:
         st.metric("📦 Products Sold", f"{curr_products:,}",
                   f"{pct_change(curr_products, prev_products):+.1f}%")
+st.markdown("---")
+tab1, tab2, tab3 = st.tabs([
+    "📅 Monthly",
+    "📦 Products",
+    "🌍 Countries"
+])
+# --------------------------------------------------
+# MONTHLY ANALYSIS
+# --------------------------------------------------
+with tab1:
+    df_clean["YearMonth"] = df_clean["InvoiceDate"].dt.to_period("M")
+    monthly_revenue = (
+        df_clean.groupby("YearMonth")["Revenue"]
+        .sum()
+        .reset_index()
+    )
+    monthly_revenue["YearMonth"] = monthly_revenue["YearMonth"].astype(str)
+    st.subheader("📈 Monthly Revenue Trend")
+    fig, ax = plt.subplots(figsize=(12,5))
+    sns.lineplot(
+        data=monthly_revenue,
+        x="YearMonth",
+        y="Revenue",
+        marker="o",
+        color="#1f77b4",
+        linewidth=2.5,
+        ax=ax
+    )
+    fig.tight_layout()
+    ax.set_title("Monthly Revenue Trend")
+    ax.set_xlabel("Month")
+    ax.set_ylabel("Revenue (£)")
+    plt.xticks(rotation=45)
+    st.pyplot(fig)
+    # --------------------------------------------------
+    # BEST PERFORMING MONTH ANALYSIS
+    # --------------------------------------------------
+    monthly_summary = (
+        df_clean.groupby("YearMonth")
+        .agg(
+            Revenue=("Revenue", "sum"),
+        )
+        .reset_index()
+    )
+    best_month_name = monthly_summary.loc[
+        monthly_summary["Revenue"].idxmax(),
+        "YearMonth"
+    ]
+    best_month_data = df_clean[
+        df_clean["YearMonth"] == best_month_name
+    ]
+    # --------------------------------------------------
+    # BEST & WORST MONTH
+    # --------------------------------------------------
+    best_month = monthly_revenue.loc[
+        monthly_revenue["Revenue"].idxmax()
+    ]
+    worst_month = monthly_revenue.loc[
+        monthly_revenue["Revenue"].idxmin()
+    ]
+    # --------------------------------------------------
+    # WORST MONTH DEEP ANALYSIS
+    # --------------------------------------------------
+    worst_month_name = worst_month["YearMonth"]
+    worst_month_data = df_clean[
+        df_clean["YearMonth"] == worst_month_name
+    ]
+
