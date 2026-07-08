@@ -114,3 +114,47 @@ def pct_change(current, previous):
     if previous == 0:
         return 0
     return ((current - previous) / previous) * 100
+
+# --------------------------------------------------
+# KPI CARDS
+# --------------------------------------------------
+
+st.markdown("---")
+st.subheader("📌 Key Performance Indicators (vs Previous Period)")
+
+col1, col2, col3, col4, col5 = st.columns(5)
+
+with col1:
+    if selected_period == "Both Years":
+        st.metric("💰 Total Revenue", f"£{curr_revenue:,.2f}")
+    else:
+        st.metric("💰 Total Revenue", f"£{curr_revenue:,.2f}",
+                  f"{pct_change(curr_revenue, prev_revenue):+.1f}%")
+
+with col2:
+    if selected_period == "Both Years":
+        st.metric("🧾 Total Orders", f"{curr_orders:,}")
+    else:
+        st.metric("🧾 Total Orders", f"{curr_orders:,}",
+                  f"{pct_change(curr_orders, prev_orders):+.1f}%")
+
+with col3:
+    if selected_period == "Both Years":
+        st.metric("👥 Total Customers", f"{curr_customers:,}")
+    else:
+        st.metric("👥 Total Customers", f"{curr_customers:,}",
+                  f"{pct_change(curr_customers, prev_customers):+.1f}%")
+
+with col4:
+    if selected_period == "Both Years":
+        st.metric("🕵️ Anonymous Customers", f"{curr_anonymous:,}")
+    else:
+        st.metric("🕵️ Anonymous Customers", f"{curr_anonymous:,}",
+                  f"{pct_change(curr_anonymous, prev_anonymous):+.1f}%")
+
+with col5:
+    if selected_period == "Both Years":
+        st.metric("📦 Products Sold", f"{curr_products:,}")
+    else:
+        st.metric("📦 Products Sold", f"{curr_products:,}",
+                  f"{pct_change(curr_products, prev_products):+.1f}%")
