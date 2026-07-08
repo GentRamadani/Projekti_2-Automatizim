@@ -226,3 +226,92 @@ with tab1:
         df_clean["YearMonth"] == worst_month_name
     ]
 
+
+    # Orders
+    worst_orders = worst_month_data["Invoice"].nunique()
+
+
+    # Customers
+    worst_customers = (
+        worst_month_data[
+            worst_month_data["Customer ID"] != "Unknown"
+        ]["Customer ID"]
+        .nunique()
+    )
+
+
+    # Average Order Value
+    worst_aov = (
+        worst_month_data["Revenue"].sum()
+        /
+        worst_orders
+    )
+
+
+    # Top Products in worst month
+    worst_top_products = (
+        worst_month_data
+        .groupby("Description")["Revenue"]
+        .sum()
+        .sort_values(ascending=False)
+        .head(5)
+    )
+
+
+    st.markdown("---")
+
+    st.subheader("🔎 Worst Month Analysis")
+
+
+    st.write(
+        f"""
+### 📉 Weakest Month: {worst_month_name}
+
+During this month:
+
+- 🧾 Total Orders: **{worst_orders:,}**
+- 👥 Active Customers: **{worst_customers:,}**
+- 💳 Average Order Value: **£{worst_aov:,.2f}**
+
+### 🏆 Top Products During This Month:
+"""
+    )
+
+
+    st.dataframe(
+        worst_top_products.reset_index()
+        .rename(
+            columns={
+                "Description":"Product",
+                "Revenue":"Revenue (£)"
+            }
+        )
+    )
+
+
+    st.markdown("---")
+    st.subheader("🏆 Best & Worst Performing Month")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.success(
+            f"""
+### 🥇 Best Month
+
+**{best_month['YearMonth']}**
+
+Revenue: **£{best_month['Revenue']:,.2f}**
+"""
+        )
+
+    with col2:
+        st.error(
+            f"""
+### 📉 Worst Month
+
+**{worst_month['YearMonth']}**
+
+Revenue: **£{worst_month['Revenue']:,.2f}**
+"""
+        )
