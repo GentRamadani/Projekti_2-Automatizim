@@ -315,3 +315,114 @@ Revenue: **£{best_month['Revenue']:,.2f}**
 Revenue: **£{worst_month['Revenue']:,.2f}**
 """
         )
+        
+
+    st.markdown("---")
+    st.subheader("🏆 Best & Worst Performing Month")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.success(
+            f"""
+### 🥇 Best Month
+
+**{best_month['YearMonth']}**
+
+Revenue: **£{best_month['Revenue']:,.2f}**
+"""
+        )
+
+    with col2:
+        st.error(
+            f"""
+### 📉 Worst Month
+
+**{worst_month['YearMonth']}**
+
+Revenue: **£{worst_month['Revenue']:,.2f}**
+"""
+        )
+
+
+
+# --------------------------------------------------
+# PRODUCTS
+# --------------------------------------------------
+
+with tab2:
+
+    product_summary = (
+        df_clean[
+            (df_clean["Description"] != "Unknown") &
+            (df_clean["Description"] != "Manual")
+        ]
+        .groupby("Description")
+        .agg(
+            Revenue=("Revenue", "sum"),
+            Quantity=("Quantity", "sum")
+        )
+    )
+
+
+    best_product_revenue = (
+        product_summary
+        .sort_values(
+            by="Revenue",
+            ascending=False
+        )
+        .index[0]
+    )
+
+    best_product_revenue_value = (
+        product_summary
+        .sort_values(
+            by="Revenue",
+            ascending=False
+        )
+        .iloc[0]["Revenue"]
+    )
+
+
+    best_product_quantity = (
+        product_summary
+        .sort_values(
+            by="Quantity",
+            ascending=False
+        )
+        .index[0]
+    )
+
+    best_product_quantity_value = (
+        product_summary
+        .sort_values(
+            by="Quantity",
+            ascending=False
+        )
+        .iloc[0]["Quantity"]
+    )
+
+
+    st.subheader("⭐ Best Product Performance")
+
+
+    col1, col2 = st.columns(2)
+
+
+    with col1:
+        st.metric(
+            "💰 Top Product (Revenue)",
+            best_product_revenue,
+            f"£{best_product_revenue_value:,.2f}"
+        )
+
+
+    with col2:
+        st.metric(
+            "📦 Top Product (Quantity)",
+            best_product_quantity,
+            f"{best_product_quantity_value:,} units"
+        )
+
+
+    st.markdown("---")
