@@ -39,9 +39,12 @@ xls = pd.ExcelFile(uploaded_file)
 
 df_2009 = pd.read_excel(xls, sheet_name="Year 2009-2010")
 df_2010 = pd.read_excel(xls, sheet_name="Year 2010-2011")
+
+
 # --------------------------------------------------
 # REPORTING PERIOD FILTER
 # --------------------------------------------------
+
 st.sidebar.header("📅 Reporting Period")
 selected_period = st.sidebar.selectbox(
     "Select Reporting Period",
@@ -53,3 +56,34 @@ elif selected_period == "Year 2009-2010":
     df = df_2009.copy()
 else:
     df = df_2010.copy()
+
+
+# --------------------------------------------------
+# PREVIOUS PERIOD FOR COMPARISON
+# --------------------------------------------------
+
+if selected_period == "Year 2010-2011":
+    df_prev = df_2009.copy()
+elif selected_period == "Year 2009-2010":
+    df_prev = df_2010.copy()
+else:
+    df_prev = df_2009.copy()
+
+
+# --------------------------------------------------
+# DATA CLEANING FUNCTION
+# --------------------------------------------------
+
+def clean_data(data):
+    data = data.copy()
+    data["Customer ID"] = data["Customer ID"].fillna("Unknown")
+    data["Description"] = data["Description"].fillna("Unknown")
+    data = data.drop_duplicates()
+    data = data[data["Quantity"] > 0]
+    data = data[data["Price"] > 0]
+    data["InvoiceDate"] = pd.to_datetime(data["InvoiceDate"])
+    data["Revenue"] = data["Quantity"] * data["Price"]
+    return data
+
+df_clean = clean_data(df)
+df_prev_clean = clean_data(df_prev)
