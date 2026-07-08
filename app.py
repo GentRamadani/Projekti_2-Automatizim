@@ -315,6 +315,44 @@ Revenue: **£{best_month['Revenue']:,.2f}**
 Revenue: **£{worst_month['Revenue']:,.2f}**
 """
         )
+        # --------------------------------------------------
+# BEST MONTH PRODUCT DRIVER
+# --------------------------------------------------
+
+st.markdown("---")
+st.subheader("🚀 Best Month Product Driver")
+
+best_month_products = (
+    best_month_data[
+        (best_month_data["Description"] != "Unknown") &
+        (best_month_data["Description"] != "Manual")
+    ]
+    .groupby("Description")
+    .agg(
+        Revenue=("Revenue", "sum"),
+        Quantity=("Quantity", "sum")
+    )
+    .sort_values("Revenue", ascending=False)
+)
+
+top_best_product_name = best_month_products.index[0]
+top_best_product_revenue = best_month_products.iloc[0]["Revenue"]
+top_best_product_quantity = best_month_products.iloc[0]["Quantity"]
+
+best_month_total_revenue = best_month_data["Revenue"].sum()
+product_share = (top_best_product_revenue / best_month_total_revenue) * 100
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("Top Product", top_best_product_name)
+
+with col2:
+    st.metric("Revenue", f"£{top_best_product_revenue:,.2f}")
+
+with col3:
+    st.metric("Contribution", f"{product_share:.1f}%")
+
 
 
     st.markdown("---")
