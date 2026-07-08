@@ -591,3 +591,31 @@ These are unusually large orders. They are not removed from the dataset, but ana
 """)
 
     st.dataframe(outliers.head(5))
+
+
+     # --------------------------------------------------
+    # AVERAGE ORDER VALUE BY COUNTRY
+    # --------------------------------------------------
+    country_analysis["Average Order Value"] = (
+        country_analysis["Revenue"] /
+        country_analysis["Orders"]
+    )
+    st.markdown("---")
+    st.subheader("💳 Average Order Value by Country")
+    avg_order_value = (
+        country_analysis["Average Order Value"]
+        .sort_values(ascending=False)
+        .head(10)
+    )
+    fig, ax = plt.subplots(figsize=(12,6))
+    sns.barplot(
+        x=avg_order_value.values,
+        y=avg_order_value.index,
+        color="#9467bd",
+        ax=ax
+    )
+    ax.set_title("Average Order Value by Country")
+    ax.set_xlabel("Average Order Value (£)")
+    ax.set_ylabel("Country")
+    fig.tight_layout()
+    st.pyplot(fig)
