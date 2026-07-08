@@ -87,3 +87,30 @@ def clean_data(data):
 
 df_clean = clean_data(df)
 df_prev_clean = clean_data(df_prev)
+
+# --------------------------------------------------
+# KPI CALCULATION FUNCTION
+# --------------------------------------------------
+
+def calculate_kpis(data):
+    revenue = data["Revenue"].sum()
+    orders = data["Invoice"].nunique()
+    customers = data[data["Customer ID"] != "Unknown"]["Customer ID"].nunique()
+    anonymous = data[data["Customer ID"] == "Unknown"]["Invoice"].nunique()
+    products = data["Quantity"].sum()
+    return revenue, orders, customers, anonymous, products
+
+# CURRENT KPIs
+curr_revenue, curr_orders, curr_customers, curr_anonymous, curr_products = calculate_kpis(df_clean)
+
+# PREVIOUS KPIs
+prev_revenue, prev_orders, prev_customers, prev_anonymous, prev_products = calculate_kpis(df_prev_clean)
+
+# --------------------------------------------------
+# % CHANGE FUNCTION
+# --------------------------------------------------
+
+def pct_change(current, previous):
+    if previous == 0:
+        return 0
+    return ((current - previous) / previous) * 100
