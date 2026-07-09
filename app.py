@@ -40,23 +40,23 @@ xls = pd.ExcelFile(uploaded_file)
 df_2009 = pd.read_excel(xls, sheet_name="Year 2009-2010")
 df_2010 = pd.read_excel(xls, sheet_name="Year 2010-2011")
 
-
 # --------------------------------------------------
 # REPORTING PERIOD FILTER
 # --------------------------------------------------
 
 st.sidebar.header("📅 Reporting Period")
+
 selected_period = st.sidebar.selectbox(
     "Select Reporting Period",
     ["Both Years", "Year 2009-2010", "Year 2010-2011"]
 )
+
 if selected_period == "Both Years":
     df = pd.concat([df_2009, df_2010], ignore_index=True)
 elif selected_period == "Year 2009-2010":
     df = df_2009.copy()
 else:
     df = df_2010.copy()
-
 
 # --------------------------------------------------
 # PREVIOUS PERIOD FOR COMPARISON
@@ -68,7 +68,6 @@ elif selected_period == "Year 2009-2010":
     df_prev = df_2010.copy()
 else:
     df_prev = df_2009.copy()
-
 
 # --------------------------------------------------
 # DATA CLEANING FUNCTION
@@ -158,26 +157,38 @@ with col5:
     else:
         st.metric("📦 Products Sold", f"{curr_products:,}",
                   f"{pct_change(curr_products, prev_products):+.1f}%")
+
 st.markdown("---")
-tab1, tab2, tab3, = st.tabs([
+
+
+tab1, tab2, tab3 = st.tabs([
     "📅 Monthly",
     "📦 Products",
     "🌍 Countries"
-    "⚠️ Outliers"
 ])
+
+
 # --------------------------------------------------
 # MONTHLY ANALYSIS
 # --------------------------------------------------
+
 with tab1:
+
     df_clean["YearMonth"] = df_clean["InvoiceDate"].dt.to_period("M")
+
     monthly_revenue = (
         df_clean.groupby("YearMonth")["Revenue"]
         .sum()
         .reset_index()
     )
+
     monthly_revenue["YearMonth"] = monthly_revenue["YearMonth"].astype(str)
+
+
     st.subheader("📈 Monthly Revenue Trend")
+
     fig, ax = plt.subplots(figsize=(12,5))
+
     sns.lineplot(
         data=monthly_revenue,
         x="YearMonth",
@@ -187,15 +198,20 @@ with tab1:
         linewidth=2.5,
         ax=ax
     )
+
     fig.tight_layout()
     ax.set_title("Monthly Revenue Trend")
     ax.set_xlabel("Month")
     ax.set_ylabel("Revenue (£)")
     plt.xticks(rotation=45)
+
     st.pyplot(fig)
+
+
     # --------------------------------------------------
     # BEST PERFORMING MONTH ANALYSIS
     # --------------------------------------------------
+
     monthly_summary = (
         df_clean.groupby("YearMonth")
         .agg(
@@ -203,26 +219,36 @@ with tab1:
         )
         .reset_index()
     )
+
     best_month_name = monthly_summary.loc[
         monthly_summary["Revenue"].idxmax(),
         "YearMonth"
     ]
+
     best_month_data = df_clean[
         df_clean["YearMonth"] == best_month_name
     ]
+
+
     # --------------------------------------------------
     # BEST & WORST MONTH
     # --------------------------------------------------
+
     best_month = monthly_revenue.loc[
         monthly_revenue["Revenue"].idxmax()
     ]
+
     worst_month = monthly_revenue.loc[
         monthly_revenue["Revenue"].idxmin()
     ]
+
+
     # --------------------------------------------------
     # WORST MONTH DEEP ANALYSIS
     # --------------------------------------------------
+
     worst_month_name = worst_month["YearMonth"]
+
     worst_month_data = df_clean[
         df_clean["YearMonth"] == worst_month_name
     ]
@@ -288,72 +314,6 @@ During this month:
             }
         )
     )
-
-
-    st.markdown("---")
-    st.subheader("🏆 Best & Worst Performing Month")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.success(
-            f"""
-### 🥇 Best Month
-
-**{best_month['YearMonth']}**
-
-Revenue: **£{best_month['Revenue']:,.2f}**
-"""
-        )
-
-    with col2:
-        st.error(
-            f"""
-### 📉 Worst Month
-
-**{worst_month['YearMonth']}**
-
-Revenue: **£{worst_month['Revenue']:,.2f}**
-"""
-        )
-        # --------------------------------------------------
-# BEST MONTH PRODUCT DRIVER
-# --------------------------------------------------
-
-st.markdown("---")
-st.subheader("🚀 Best Month Product Driver")
-
-best_month_products = (
-    best_month_data[
-        (best_month_data["Description"] != "Unknown") &
-        (best_month_data["Description"] != "Manual")
-    ]
-    .groupby("Description")
-    .agg(
-        Revenue=("Revenue", "sum"),
-        Quantity=("Quantity", "sum")
-    )
-    .sort_values("Revenue", ascending=False)
-)
-
-top_best_product_name = best_month_products.index[0]
-top_best_product_revenue = best_month_products.iloc[0]["Revenue"]
-top_best_product_quantity = best_month_products.iloc[0]["Quantity"]
-
-best_month_total_revenue = best_month_data["Revenue"].sum()
-product_share = (top_best_product_revenue / best_month_total_revenue) * 100
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.metric("Top Product", top_best_product_name)
-
-with col2:
-    st.metric("Revenue", f"£{top_best_product_revenue:,.2f}")
-
-with col3:
-    st.metric("Contribution", f"{product_share:.1f}%")
-
 
 
     st.markdown("---")
@@ -466,6 +426,7 @@ with tab2:
 
     st.markdown("---")
 
+
     # --------------------------------------------------
     # TOP 10 PRODUCTS
     # --------------------------------------------------
@@ -502,32 +463,50 @@ with tab2:
 
     st.pyplot(fig)
 
+
+
 # --------------------------------------------------
 # COUNTRIES
 # --------------------------------------------------
+
 with tab3:
+
     top_countries = (
         df_clean.groupby("Country")["Revenue"]
         .sum()
         .sort_values(ascending=False)
         .head(10)
     )
+
+
     st.subheader("🌍 Top 10 Countries by Revenue")
+
+
     fig, ax = plt.subplots(figsize=(12,6))
+
+
     sns.barplot(
         x=top_countries.values,
         y=top_countries.index,
         color="#2ca02c",
         ax=ax
     )
+
+
     fig.tight_layout()
+
     ax.set_title("Top 10 Countries by Revenue")
     ax.set_xlabel("Revenue (£)")
     ax.set_ylabel("Country")
+
     st.pyplot(fig)
+
+
+
     # --------------------------------------------------
     # Country Performance Table
     # --------------------------------------------------
+
     country_analysis = (
         df_clean.groupby("Country")
         .agg(
@@ -540,82 +519,52 @@ with tab3:
             ascending=False
         )
     )
+
+
     st.markdown("---")
     st.subheader("📊 Country Performance Table")
+
     st.dataframe(country_analysis.head(10))
 
-# --------------------------------------------------
-# OUTLIER ANALYSIS
-# --------------------------------------------------
-
-with tab4:
-
-    st.subheader("⚠️ Outlier Analysis - Large Orders")
-
-    invoice_revenue = (
-        df_clean.groupby("Invoice")
-        .agg(
-            Revenue=("Revenue", "sum"),
-            Products=("Quantity", "sum"),
-            Date=("InvoiceDate", "min")
-        )
-        .reset_index()
-    )
-
-    Q1 = invoice_revenue["Revenue"].quantile(0.25)
-    Q3 = invoice_revenue["Revenue"].quantile(0.75)
-    IQR = Q3 - Q1
-
-    upper_limit = Q3 + 1.5 * IQR
-
-    outliers = invoice_revenue[
-        invoice_revenue["Revenue"] > upper_limit
-    ].sort_values("Revenue", ascending=False)
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        st.metric("Q1", f"£{Q1:,.2f}")
-
-    with col2:
-        st.metric("Q3", f"£{Q3:,.2f}")
-
-    with col3:
-        st.metric("IQR", f"£{IQR:,.2f}")
-
-    with col4:
-        st.metric("Extreme Orders", f"{len(outliers):,}")
-
-    st.write("""
-These are unusually large orders. They are not removed from the dataset, but analyzed separately because they can strongly affect monthly revenue.
-""")
-
-    st.dataframe(outliers.head(5))
 
 
-     # --------------------------------------------------
+    # --------------------------------------------------
     # AVERAGE ORDER VALUE BY COUNTRY
     # --------------------------------------------------
+
     country_analysis["Average Order Value"] = (
         country_analysis["Revenue"] /
         country_analysis["Orders"]
     )
+
+
     st.markdown("---")
     st.subheader("💳 Average Order Value by Country")
+
+
     avg_order_value = (
         country_analysis["Average Order Value"]
         .sort_values(ascending=False)
         .head(10)
     )
+
+
     fig, ax = plt.subplots(figsize=(12,6))
+
+
     sns.barplot(
         x=avg_order_value.values,
         y=avg_order_value.index,
         color="#9467bd",
         ax=ax
     )
+
+
     ax.set_title("Average Order Value by Country")
     ax.set_xlabel("Average Order Value (£)")
     ax.set_ylabel("Country")
+
+
     fig.tight_layout()
+
     st.pyplot(fig)
