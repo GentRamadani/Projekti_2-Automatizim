@@ -159,7 +159,7 @@ with col5:
         st.metric("📦 Products Sold", f"{curr_products:,}",
                   f"{pct_change(curr_products, prev_products):+.1f}%")
 st.markdown("---")
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, = st.tabs([
     "📅 Monthly",
     "📦 Products",
     "🌍 Countries"
