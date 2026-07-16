@@ -466,6 +466,9 @@ with tab2:
         )
 
 
+        
+
+
     st.markdown("---")
 
 
@@ -559,14 +562,13 @@ with tab2:
     fig.tight_layout()
 
     st.pyplot(fig)
+    
+    st.subheader("📈 Përshkrimi i grafikut")
 
-
-st.subheader("📈 Përshkrimi i grafikut")
-
-st.write("""
+    st.write("""
 Ky grafik paraqet **10 produktet me të ardhurat më të larta për njësi të shitur (Revenue per Unit)**.
 
-Ky tregues llogaritet duke pjesëtuar të ardhurat totale të gjeneruara nga një produkt me numrin total të njësive të shitura. Në këtë mënyrë identifikohen produktet që sjellin vlerën më të madhe për çdo njësi të shitur, pavarësisht nga sasia totale e shitjeve.
+ Ky tregues llogaritet duke pjesëtuar të ardhurat totale të gjeneruara nga një produkt me numrin total të njësive të shitura. Në këtë mënyrë identifikohen produktet që sjellin vlerën më të madhe për çdo njësi të shitur, pavarësisht nga sasia totale e shitjeve.
 
 **Formula e përdorur:**
 
