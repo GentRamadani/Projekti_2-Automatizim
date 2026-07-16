@@ -1,4 +1,4 @@
-import streamlit as st
+fs = [import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -50,17 +50,22 @@ for sheet in sheet_names:
 # REPORTING PERIOD FILTER
 # --------------------------------------------------
 
-st.sidebar.header("📅 Reporting Period")
+st.sidebar.header("📅 Select Sheets")
 
-selected_period = st.sidebar.selectbox(
-    "Select Reporting Period",
-    ["All Sheets"] + sheet_names
+selected_sheets = st.sidebar.multiselect(
+    "Choose one or more sheets",
+    options=sheet_names,
+    default=sheet_names
 )
 
-if selected_period == "All Sheets":
-    df = pd.concat(dfs.values(), ignore_index=True)
-else:
-    df = dfs[selected_period].copy()
+if len(selected_sheets) == 0:
+    st.warning("Please select at least one sheet.")
+    st.stop()
+
+df = pd.concat(
+    [dfs[sheet] for sheet in selected_sheets],
+    ignore_index=True
+)
 
 # --------------------------------------------------
 # DATA CLEANING FUNCTION
