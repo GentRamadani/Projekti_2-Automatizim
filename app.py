@@ -37,8 +37,16 @@ if uploaded_file is None:
 
 xls = pd.ExcelFile(uploaded_file)
 
-df_2009 = pd.read_excel(xls, sheet_name="Year 2009-2010")
-df_2010 = pd.read_excel(xls, sheet_name="Year 2010-2011")
+sheet_names = xls.sheet_names
+
+dfs = []
+
+for sheet in sheet_names:
+    temp = pd.read_excel(xls, sheet_name=sheet)
+    temp["Sheet"] = sheet
+    dfs.append(temp)
+
+df = pd.concat(dfs, ignore_index=True)
 
 # --------------------------------------------------
 # REPORTING PERIOD FILTER
@@ -48,26 +56,13 @@ st.sidebar.header("📅 Reporting Period")
 
 selected_period = st.sidebar.selectbox(
     "Select Reporting Period",
-    ["Both Years", "Year 2009-2010", "Year 2010-2011"]
+    ["All Sheets"] + sheet_names
 )
 
-if selected_period == "Both Years":
-    df = pd.concat([df_2009, df_2010], ignore_index=True)
-elif selected_period == "Year 2009-2010":
-    df = df_2009.copy()
+if selected_period == "All Sheets":
+    df = pd.concat(dfs.values(), ignore_index=True)
 else:
-    df = df_2010.copy()
-
-# --------------------------------------------------
-# PREVIOUS PERIOD FOR COMPARISON
-# --------------------------------------------------
-
-if selected_period == "Year 2010-2011":
-    df_prev = df_2009.copy()
-elif selected_period == "Year 2009-2010":
-    df_prev = df_2010.copy()
-else:
-    df_prev = df_2009.copy()
+    df = dfs[selected_period].copy()
 
 # --------------------------------------------------
 # DATA CLEANING FUNCTION
@@ -85,7 +80,6 @@ def clean_data(data):
     return data
 
 df_clean = clean_data(df)
-df_prev_clean = clean_data(df_prev)
 
 # --------------------------------------------------
 # KPI CALCULATION FUNCTION
@@ -102,61 +96,44 @@ def calculate_kpis(data):
 # CURRENT KPIs
 curr_revenue, curr_orders, curr_customers, curr_anonymous, curr_products = calculate_kpis(df_clean)
 
-# PREVIOUS KPIs
-prev_revenue, prev_orders, prev_customers, prev_anonymous, prev_products = calculate_kpis(df_prev_clean)
-
-# --------------------------------------------------
-# % CHANGE FUNCTION
-# --------------------------------------------------
-
-def pct_change(current, previous):
-    if previous == 0:
-        return 0
-    return ((current - previous) / previous) * 100
-
 # --------------------------------------------------
 # KPI CARDS
 # --------------------------------------------------
 
 st.markdown("---")
-st.subheader("📌 Key Performance Indicators (vs Previous Period)")
+st.subheader("📌 Key Performance Indicators")
 
 col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
-    if selected_period == "Both Years":
-        st.metric("💰 Total Revenue", f"£{curr_revenue:,.2f}")
-    else:
-        st.metric("💰 Total Revenue", f"£{curr_revenue:,.2f}",
-                  f"{pct_change(curr_revenue, prev_revenue):+.1f}%")
+    st.metric(
+        "💰 Total Revenue",
+        f"£{curr_revenue:,.2f}"
+    )
 
 with col2:
-    if selected_period == "Both Years":
-        st.metric("🧾 Total Orders", f"{curr_orders:,}")
-    else:
-        st.metric("🧾 Total Orders", f"{curr_orders:,}",
-                  f"{pct_change(curr_orders, prev_orders):+.1f}%")
+    st.metric(
+        "🧾 Total Orders",
+        f"{curr_orders:,}"
+    )
 
 with col3:
-    if selected_period == "Both Years":
-        st.metric("👥 Total Customers", f"{curr_customers:,}")
-    else:
-        st.metric("👥 Total Customers", f"{curr_customers:,}",
-                  f"{pct_change(curr_customers, prev_customers):+.1f}%")
+    st.metric(
+        "👥 Total Customers",
+        f"{curr_customers:,}"
+    )
 
 with col4:
-    if selected_period == "Both Years":
-        st.metric("🕵️ Anonymous Customers", f"{curr_anonymous:,}")
-    else:
-        st.metric("🕵️ Anonymous Customers", f"{curr_anonymous:,}",
-                  f"{pct_change(curr_anonymous, prev_anonymous):+.1f}%")
+    st.metric(
+        "🕵️ Anonymous Customers",
+        f"{curr_anonymous:,}"
+    )
 
 with col5:
-    if selected_period == "Both Years":
-        st.metric("📦 Products Sold", f"{curr_products:,}")
-    else:
-        st.metric("📦 Products Sold", f"{curr_products:,}",
-                  f"{pct_change(curr_products, prev_products):+.1f}%")
+    st.metric(
+        "📦 Products Sold",
+        f"{curr_products:,}"
+    )
 
 st.markdown("---")
 
