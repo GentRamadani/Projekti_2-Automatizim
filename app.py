@@ -111,7 +111,7 @@ col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
     st.metric(
         "💰 Total Revenue",
-        f"£{curr_revenue:,.2f}"
+        f"£{curr_revenue:,.0f}"
     )
 
 with col2:
@@ -297,22 +297,23 @@ During this month:
 
 - 🧾 Total Orders: **{worst_orders:,}**
 - 👥 Active Customers: **{worst_customers:,}**
-- 💳 Average Order Value: **£{worst_aov:,.2f}**
+- 💳 Average Order Value: **£{worst_aov:,.0f}**
 
 ### 🏆 Top Products During This Month:
 """
     )
 
 
-    st.dataframe(
-        worst_top_products.reset_index()
-        .rename(
-            columns={
-                "Description":"Product",
-                "Revenue":"Revenue (£)"
-            }
-        )
-    )
+worst_table = worst_top_products.reset_index().rename(
+    columns={
+        "Description": "Product",
+        "Revenue": "Revenue (£)"
+    }
+)
+
+worst_table["Revenue (£)"] = worst_table["Revenue (£)"].round(0).astype(int)
+
+st.dataframe(worst_table)
 
 
     st.markdown("---")
@@ -327,7 +328,7 @@ During this month:
 
 **{best_month['YearMonth']}**
 
-Revenue: **£{best_month['Revenue']:,.2f}**
+Revenue: **£{best_month['Revenue']:,.0f}**
 """
         )
 
@@ -338,7 +339,7 @@ Revenue: **£{best_month['Revenue']:,.2f}**
 
 **{worst_month['YearMonth']}**
 
-Revenue: **£{worst_month['Revenue']:,.2f}**
+Revenue: **£{worst_month['Revenue']:,.0f}**
 """
         )
 
@@ -443,7 +444,7 @@ with tab2:
         st.write(best_product_revenue)
         st.metric(
             "Revenue",
-            f"£{best_product_revenue_value:,.2f}"
+            f"£{best_product_revenue_value:,.0f}"
     )
 
 
@@ -461,7 +462,7 @@ with tab2:
         st.write(best_product_unit)
         st.metric(
             "Revenue per Unit",
-            f"£{best_product_unit_value:,.2f} / unit"
+            f"£{best_product_unit_value:,.0f} / unit"
         )
 
 
@@ -527,6 +528,12 @@ with tab2:
         )
         .head(10)
     )
+
+    top_unit_products["Revenue per Unit"] = (
+    top_unit_products["Revenue per Unit"]
+    .round(0)
+    .astype(int)
+)
 
 
     st.subheader("💷 Top 10 Products by Revenue per Unit")
@@ -628,7 +635,7 @@ with tab3:
     st.markdown("---")
     st.subheader("📊 Country Performance Table")
 
-    st.dataframe(country_analysis.head(10))
+    
 
 
 
@@ -640,6 +647,15 @@ with tab3:
         country_analysis["Revenue"] /
         country_analysis["Orders"]
     )
+
+    country_analysis["Revenue"] = country_analysis["Revenue"].round(0).astype(int)
+    country_analysis["Average Order Value"] = (
+        country_analysis["Average Order Value"]
+        .round(0)
+        .astype(int)
+    )
+
+    st.dataframe(country_analysis.head(10))
 
 
     st.markdown("---")
