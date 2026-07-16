@@ -351,10 +351,17 @@ Revenue: **£{worst_month['Revenue']:,.2f}**
 with tab2:
 
     product_summary = (
-        df_clean[
-            (df_clean["Description"] != "Unknown") &
-            (df_clean["Description"] != "Manual")
-        ]
+    df_clean[
+        (~df_clean["Description"].isin([
+            "Unknown",
+            "Manual",
+            "Adjust bad debt",
+            "POSTAGE",
+            "Discount",
+            "Amazon Fee",
+            "Bank Charges"
+        ]))
+    ]
         .groupby("Description")
         .agg(
             Revenue=("Revenue", "sum"),
@@ -460,8 +467,18 @@ with tab2:
     # --------------------------------------------------
 
     top_products = (
-        df_clean[df_clean["Description"] != "Unknown"]
-        .groupby("Description")["Revenue"]
+    df_clean[
+        (~df_clean["Description"].isin([
+            "Unknown",
+            "Manual",
+            "Adjust bad debt",
+            "POSTAGE",
+            "Discount",
+            "Amazon Fee",
+            "Bank Charges"
+        ]))
+    ]
+    .groupby("Description")["Revenue"]
         .sum()
         .sort_values(ascending=False)
         .head(10)
