@@ -189,13 +189,16 @@ with tab1:
 
     st.caption(
         """
-**Përshkrimi i grafikut**
+st.subheader("📈 Përshkrimi i grafikut")
 
+st.write(
+    """
 Ky grafik paraqet trendin e të ardhurave mujore gjatë periudhës së zgjedhur.
 Ai tregon se si ndryshojnë shitjet nga muaji në muaj dhe ndihmon në identifikimin
 e periudhave me performancë më të mirë ose më të dobët.
 
 **Shënim:** Vlera `1e6` në boshtin Y paraqet miliona.
+
 `1e6 = 1,000,000`, pra një vlerë 1.5 në grafik përfaqëson
 £1,500,000 të ardhura.
 """
@@ -348,16 +351,21 @@ Revenue: **£{worst_month['Revenue']:,.2f}**
 with tab2:
 
     product_summary = (
-        df_clean[
-            (df_clean["Description"] != "Unknown") &
-            (df_clean["Description"] != "Manual")
-        ]
-        .groupby("Description")
-        .agg(
-            Revenue=("Revenue", "sum"),
-            Quantity=("Quantity", "sum")
-        )
+    df_clean[
+        (df_clean["Description"] != "Unknown") &
+        (df_clean["Description"] != "Manual")
+    ]
+    .groupby("Description")
+    .agg(
+        Revenue=("Revenue", "sum"),
+        Quantity=("Quantity", "sum")
     )
+)
+
+product_summary["Revenue per Unit"] = (
+    product_summary["Revenue"] /
+    product_summary["Quantity"]
+)
 
 
     best_product_revenue = (
@@ -397,11 +405,28 @@ with tab2:
         .iloc[0]["Quantity"]
     )
 
+    best_product_unit = (
+        product_summary
+        .sort_values(
+            by="Revenue per Unit",
+            ascending=False
+        )
+        .index[0]
+    )
+
+    best_product_unit_value = (
+        product_summary
+        .sort_values(
+            by="Revenue per Unit",
+            ascending=False
+        )
+        .iloc[0]["Revenue per Unit"]
+    )
 
     st.subheader("⭐ Best Product Performance")
 
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
 
     with col1:
@@ -417,6 +442,13 @@ with tab2:
             "📦 Top Product (Quantity)",
             best_product_quantity,
             f"{best_product_quantity_value:,} units"
+        )
+
+    with col2:
+        st.metric(
+            "💷 Highest Revenue per Unit",
+            best_product_unit,
+            f"£{best_product_unit_value:,.2f} / unit"
         )
 
 
