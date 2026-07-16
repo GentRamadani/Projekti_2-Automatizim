@@ -519,6 +519,47 @@ with tab2:
     st.pyplot(fig)
 
 
+    # --------------------------------------------------
+    # TOP 10 PRODUCTS BY REVENUE PER UNIT
+    # --------------------------------------------------
+
+    top_unit_products = (
+        product_summary[
+            product_summary["Quantity"] >= 50
+        ]
+        .sort_values(
+            by="Revenue per Unit",
+            ascending=False
+        )
+        .head(10)
+    )
+
+
+    st.subheader("💷 Top 10 Products by Revenue per Unit")
+
+
+    fig, ax = plt.subplots(figsize=(12,6))
+
+
+    sns.barplot(
+        data=top_unit_products.reset_index(),
+        x="Revenue per Unit",
+        y="Description",
+        color="#9467bd",
+        ax=ax
+    )
+
+
+    ax.set_title("Top 10 Products by Revenue per Unit")
+    ax.set_xlabel("Revenue per Unit (£)")
+    ax.set_ylabel("Product")
+
+
+    fig.tight_layout()
+
+    st.pyplot(fig)
+
+
 
 # --------------------------------------------------
 # COUNTRIES
