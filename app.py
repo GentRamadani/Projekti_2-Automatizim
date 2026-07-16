@@ -352,17 +352,20 @@ with tab2:
 
     product_summary = (
     df_clean[
-        (~df_clean["Description"].isin([
-            "Unknown",
-            "Manual",
-            "Adjust bad debt",
-            "POSTAGE",
-            "Discount",
-            "Amazon Fee",
-            "AMAZON FEE",
-            "Bank Charges"
-        ]))
+        (~df_clean["Description"].str.contains(
+            "adjust|amazon|fee|manual|postage|discount|bank|bad debt",
+            case=False,
+            na=False
+        ))
+        &
+        (df_clean["Description"] != "Unknown")
     ]
+    .groupby("Description")
+    .agg(
+        Revenue=("Revenue", "sum"),
+        Quantity=("Quantity", "sum")
+    )
+)
         .groupby("Description")
         .agg(
             Revenue=("Revenue", "sum"),
@@ -477,17 +480,19 @@ with tab2:
 
     top_products = (
     df_clean[
-        (~df_clean["Description"].isin([
-            "Unknown",
-            "Manual",
-            "Adjust bad debt",
-            "POSTAGE",
-            "Discount",
-            "Amazon Fee",
-            "AMAZON FEE",   
-            "Bank Charges"
-        ]))
+        (~df_clean["Description"].str.contains(
+            "adjust|amazon|fee|manual|postage|discount|bank|bad debt",
+            case=False,
+            na=False
+        ))
+        &
+        (df_clean["Description"] != "Unknown")
     ]
+    .groupby("Description")["Revenue"]
+    .sum()
+    .sort_values(ascending=False)
+    .head(10)
+)
     .groupby("Description")["Revenue"]
         .sum()
         .sort_values(ascending=False)
