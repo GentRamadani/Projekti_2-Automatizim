@@ -442,24 +442,28 @@ with tab2:
 
 
     with col1:
+        st.markdown("### 💰 Top Product (Revenue)")
+        st.write(best_product_revenue)
         st.metric(
-            "💰 Top Product (Revenue)",
-            best_product_revenue,
+            "Revenue",
             f"£{best_product_revenue_value:,.2f}"
-        )
+    )
+
 
 
     with col2:
+        st.markdown("### 📦 Top Product (Quantity)")
+        st.write(best_product_quantity)
         st.metric(
-            "📦 Top Product (Quantity)",
-            best_product_quantity,
-            f"{best_product_quantity_value:,} units"
+            "Quantity Sold",
+            f"{best_product_quantity_value:,.0f} units"
         )
 
     with col3:
+        st.markdown("### 💷 Highest Revenue per Unit")
+        st.write(best_product_unit)
         st.metric(
-            "💷 Highest Revenue per Unit",
-            best_product_unit,
+            "Revenue per Unit",
             f"£{best_product_unit_value:,.2f} / unit"
         )
 
