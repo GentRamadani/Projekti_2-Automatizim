@@ -39,14 +39,12 @@ xls = pd.ExcelFile(uploaded_file)
 
 sheet_names = xls.sheet_names
 
-dfs = []
+dfs = {}
 
 for sheet in sheet_names:
     temp = pd.read_excel(xls, sheet_name=sheet)
     temp["Sheet"] = sheet
-    dfs.append(temp)
-
-df = pd.concat(dfs, ignore_index=True)
+    dfs[sheet] = temp
 
 # --------------------------------------------------
 # REPORTING PERIOD FILTER
