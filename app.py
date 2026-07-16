@@ -316,8 +316,8 @@ During this month:
     st.dataframe(worst_table)
 
 
-        st.markdown("---")
-        st.subheader("🏆 Best & Worst Performing Month")
+    st.markdown("---")
+    st.subheader("🏆 Best & Worst Performing Month")
 
     col1, col2 = st.columns(2)
 
