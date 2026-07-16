@@ -304,20 +304,20 @@ During this month:
     )
 
 
-worst_table = worst_top_products.reset_index().rename(
-    columns={
-        "Description": "Product",
-        "Revenue": "Revenue (£)"
-    }
-)
+    worst_table = worst_top_products.reset_index().rename(
+        columns={
+            "Description": "Product",
+            "Revenue": "Revenue (£)"
+        }
+    )
 
-worst_table["Revenue (£)"] = worst_table["Revenue (£)"].round(0).astype(int)
+    worst_table["Revenue (£)"] = worst_table["Revenue (£)"].round(0).astype(int)
 
-st.dataframe(worst_table)
+    st.dataframe(worst_table)
 
 
-    st.markdown("---")
-    st.subheader("🏆 Best & Worst Performing Month")
+        st.markdown("---")
+        st.subheader("🏆 Best & Worst Performing Month")
 
     col1, col2 = st.columns(2)
 
