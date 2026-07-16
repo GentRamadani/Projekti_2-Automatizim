@@ -187,6 +187,22 @@ with tab1:
 
     st.pyplot(fig)
 
+    st.caption(
+        """
+**Përshkrimi i grafikut**
+
+Ky grafik paraqet trendin e të ardhurave mujore gjatë periudhës së zgjedhur.
+Ai tregon se si ndryshojnë shitjet nga muaji në muaj dhe ndihmon në identifikimin
+e periudhave me performancë më të mirë ose më të dobët.
+
+**Shënim:** Vlera `1e6` në boshtin Y paraqet miliona.
+`1e6 = 1,000,000`, pra një vlerë 1.5 në grafik përfaqëson
+£1,500,000 të ardhura.
+"""
+)
+
+    
+
 
     # --------------------------------------------------
     # BEST PERFORMING MONTH ANALYSIS
