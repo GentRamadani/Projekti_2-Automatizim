@@ -359,6 +359,7 @@ with tab2:
             "POSTAGE",
             "Discount",
             "Amazon Fee",
+            "AMAZON FEE",
             "Bank Charges"
         ]))
     ]
@@ -373,6 +374,10 @@ with tab2:
         product_summary["Revenue"] /
         product_summary["Quantity"]
     )
+
+    product_summary = product_summary[
+    product_summary["Quantity"] >= 10
+]
 
 
     best_product_revenue = (
@@ -475,6 +480,7 @@ with tab2:
             "POSTAGE",
             "Discount",
             "Amazon Fee",
+            "AMAZON FEE",   
             "Bank Charges"
         ]))
     ]
