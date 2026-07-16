@@ -187,22 +187,22 @@ with tab1:
 
     st.pyplot(fig)
 
-    st.caption(
-        """
     st.subheader("📈 Përshkrimi i grafikut")
 
     st.write(
         """
-Ky grafik paraqet trendin e të ardhurave mujore gjatë periudhës së zgjedhur.
-Ai tregon se si ndryshojnë shitjet nga muaji në muaj dhe ndihmon në identifikimin
-e periudhave me performancë më të mirë ose më të dobët.
+Ky grafik paraqet ndryshimin e të ardhurave totale nga muaji në muaj gjatë periudhës së zgjedhur.
 
-**Shënim:** Vlera `1e6` në boshtin Y paraqet miliona.
+Ai ndihmon në identifikimin e muajve me performancë më të lartë ose më të ulët 
+dhe tregon trendin e përgjithshëm të shitjeve.
 
-`1e6 = 1,000,000`, pra një vlerë 1.5 në grafik përfaqëson
+**Shënim:** Boshti Y përdor formatin shkencor për vlera të mëdha.
+
+Për shembull:
+`1e6 = 1,000,000`, pra vlera 1.5 në grafik përfaqëson
 £1,500,000 të ardhura.
 """
-    )
+)
 
     
 
