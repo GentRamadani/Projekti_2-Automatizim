@@ -189,10 +189,10 @@ with tab1:
 
     st.caption(
         """
-st.subheader("📈 Përshkrimi i grafikut")
+    st.subheader("📈 Përshkrimi i grafikut")
 
-st.write(
-    """
+    st.write(
+        """
 Ky grafik paraqet trendin e të ardhurave mujore gjatë periudhës së zgjedhur.
 Ai tregon se si ndryshojnë shitjet nga muaji në muaj dhe ndihmon në identifikimin
 e periudhave me performancë më të mirë ose më të dobët.
@@ -202,7 +202,7 @@ e periudhave me performancë më të mirë ose më të dobët.
 `1e6 = 1,000,000`, pra një vlerë 1.5 në grafik përfaqëson
 £1,500,000 të ardhura.
 """
-)
+    )
 
     
 
@@ -444,7 +444,7 @@ product_summary["Revenue per Unit"] = (
             f"{best_product_quantity_value:,} units"
         )
 
-    with col2:
+    with col3:
         st.metric(
             "💷 Highest Revenue per Unit",
             best_product_unit,
