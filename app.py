@@ -351,21 +351,21 @@ Revenue: **£{worst_month['Revenue']:,.2f}**
 with tab2:
 
     product_summary = (
-    df_clean[
-        (df_clean["Description"] != "Unknown") &
-        (df_clean["Description"] != "Manual")
-    ]
-    .groupby("Description")
-    .agg(
-        Revenue=("Revenue", "sum"),
-        Quantity=("Quantity", "sum")
+        df_clean[
+            (df_clean["Description"] != "Unknown") &
+            (df_clean["Description"] != "Manual")
+        ]
+        .groupby("Description")
+        .agg(
+            Revenue=("Revenue", "sum"),
+            Quantity=("Quantity", "sum")
+        )
     )
-)
 
-product_summary["Revenue per Unit"] = (
-    product_summary["Revenue"] /
-    product_summary["Quantity"]
-)
+    product_summary["Revenue per Unit"] = (
+        product_summary["Revenue"] /
+        product_summary["Quantity"]
+    )
 
 
     best_product_revenue = (
