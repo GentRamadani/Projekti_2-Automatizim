@@ -690,3 +690,127 @@ with tab3:
     fig.tight_layout()
 
     st.pyplot(fig)
+
+        # --------------------------------------------------
+    # UNITED KINGDOM PRODUCT ANALYSIS
+    # --------------------------------------------------
+
+    st.markdown("---")
+    st.subheader("🇬🇧 United Kingdom Product Analysis")
+
+    uk_data = df_clean[
+        df_clean["Country"].str.strip().str.lower()
+        == "united kingdom"
+    ].copy()
+
+    # Remove non-product descriptions
+    uk_product_data = uk_data[
+        (~uk_data["Description"].str.contains(
+            "adjust|amazon|fee|manual|postage|discount|bank|bad debt",
+            case=False,
+            na=False
+        ))
+        &
+        (uk_data["Description"] != "Unknown")
+    ]
+
+    uk_products = (
+        uk_product_data
+        .groupby("Description")
+        .agg(
+            Revenue=("Revenue", "sum"),
+            Quantity=("Quantity", "sum"),
+            Orders=("Invoice", "nunique")
+        )
+        .sort_values("Revenue", ascending=False)
+    )
+
+    if not uk_products.empty:
+
+        uk_top_product = uk_products.iloc[0]
+        uk_top_product_name = uk_products.index[0]
+
+        uk_total_revenue = uk_data["Revenue"].sum()
+
+        uk_product_share = (
+            uk_top_product["Revenue"]
+            / uk_total_revenue
+            * 100
+        )
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.metric(
+                "🏆 Top Product",
+                uk_top_product_name
+            )
+
+        with col2:
+            st.metric(
+                "💰 Product Revenue",
+                f"£{uk_top_product['Revenue']:,.0f}"
+            )
+
+        with col3:
+            st.metric(
+                "📊 Share of UK Revenue",
+                f"{uk_product_share:.2f}%"
+            )
+
+        st.write(
+            f"""
+The highest-revenue product in the United Kingdom is
+**{uk_top_product_name}**.
+
+It generated **£{uk_top_product['Revenue']:,.0f}** from
+**{uk_top_product['Quantity']:,.0f} units sold**.
+"""
+        )
+
+        uk_top_10 = uk_products.head(10).reset_index()
+
+        st.subheader("🏆 Top 10 UK Products by Revenue")
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+        sns.barplot(
+            data=uk_top_10,
+            x="Revenue",
+            y="Description",
+            color="#1f77b4",
+            ax=ax
+        )
+
+        ax.set_title("Top 10 Products in the United Kingdom")
+        ax.set_xlabel("Revenue (£)")
+        ax.set_ylabel("Product")
+
+        fig.tight_layout()
+        st.pyplot(fig)
+
+        uk_top_10 = uk_top_10.rename(
+            columns={
+                "Description": "Product",
+                "Revenue": "Revenue (£)",
+                "Quantity": "Units Sold"
+            }
+        )
+
+        uk_top_10["Revenue (£)"] = (
+            uk_top_10["Revenue (£)"]
+            .round(0)
+            .astype(int)
+        )
+
+        st.dataframe(
+            uk_top_10[
+                ["Product", "Revenue (£)", "Units Sold", "Orders"]
+            ],
+            use_container_width=True
+        )
+
+    else:
+        st.warning(
+            "No United Kingdom product data was found."
+        )
