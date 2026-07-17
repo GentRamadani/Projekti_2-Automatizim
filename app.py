@@ -181,19 +181,19 @@ with tab1:
         ax=ax
     )
 
-fig.tight_layout()
+    fig.tight_layout()
 
-ax.set_title("Monthly Revenue Trend")
-ax.set_xlabel("Month")
-ax.set_ylabel("Revenue")
+    ax.set_title("Monthly Revenue Trend")
+    ax.set_xlabel("Month")
+    ax.set_ylabel("Revenue")
 
-ax.yaxis.set_major_formatter(
+    ax.yaxis.set_major_formatter(
     FuncFormatter(lambda value, position: f"£{value / 1_000_000:.1f}M")
 )
 
-plt.xticks(rotation=45)
+    plt.xticks(rotation=45)
 
-st.pyplot(fig)
+
     st.pyplot(fig)
 
     st.subheader("📈 Përshkrimi i grafikut")
