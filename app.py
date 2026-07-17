@@ -141,7 +141,7 @@ with col5:
 st.markdown("---")
 
 
-tab1, tab2, tab3 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "📅 Monthly",
     "📦 Products",
     "🌍 Countries"
@@ -820,7 +820,7 @@ It generated **£{uk_top_product['Revenue']:,.0f}** from
 # SALES BY WEEKDAY
 # --------------------------------------------------
 
-with tab5:
+with tab4:
 
     st.subheader("📆 Sales by Weekday")
 
