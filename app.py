@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from matplotlib.ticker import FuncFormatter
 # --------------------------------------------------
 # PAGE CONFIGURATION
 # --------------------------------------------------
@@ -898,7 +899,9 @@ with tab4:
     ax.set_title("Revenue by Day of the Week")
     ax.set_xlabel("Day")
     ax.set_ylabel("Revenue (£)")
-
+    ax.yaxis.set_major_formatter(
+    FuncFormatter(lambda value, position: f"£{value / 1_000_000:.1f}M")
+)
     plt.xticks(rotation=30)
 
     fig.tight_layout()
