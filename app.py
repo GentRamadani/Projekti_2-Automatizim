@@ -187,26 +187,8 @@ with tab1:
 
     st.pyplot(fig)
 
-    st.subheader("📈 Përshkrimi i grafikut")
-
-    st.write(
-        """
-Ky grafik paraqet ndryshimin e të ardhurave totale nga muaji në muaj gjatë periudhës së zgjedhur.
-
-Ai ndihmon në identifikimin e muajve me performancë më të lartë ose më të ulët 
-dhe tregon trendin e përgjithshëm të shitjeve.
-
-**Shënim:** Boshti Y përdor formatin shkencor për vlera të mëdha.
-
-Për shembull:
-`1e6 = 1,000,000`, pra vlera 1.5 në grafik përfaqëson
-£1,500,000 të ardhura.
-"""
-)
 
     
-
-
     # --------------------------------------------------
     # BEST PERFORMING MONTH ANALYSIS
     # --------------------------------------------------
