@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import numpy as np
+from matplotlib.ticker import FuncFormatter
 # --------------------------------------------------
 # PAGE CONFIGURATION
 # --------------------------------------------------
@@ -141,10 +142,11 @@ with col5:
 st.markdown("---")
 
 
-tab1, tab2, tab3 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "📅 Monthly",
     "📦 Products",
-    "🌍 Countries"
+    "🌍 Countries",
+    "📆 Weekday Analysis"
 ])
 
 
@@ -180,10 +182,17 @@ with tab1:
     )
 
     fig.tight_layout()
+
     ax.set_title("Monthly Revenue Trend")
     ax.set_xlabel("Month")
-    ax.set_ylabel("Revenue (£)")
+    ax.set_ylabel("Revenue")
+
+    ax.yaxis.set_major_formatter(
+    FuncFormatter(lambda value, position: f"£{value / 1_000_000:.1f}M")
+)
+
     plt.xticks(rotation=45)
+
 
     st.pyplot(fig)
 
@@ -672,3 +681,323 @@ with tab3:
     fig.tight_layout()
 
     st.pyplot(fig)
+
+        # --------------------------------------------------
+    # UNITED KINGDOM PRODUCT ANALYSIS
+    # --------------------------------------------------
+
+    st.markdown("---")
+    st.subheader("🇬🇧 United Kingdom Product Analysis")
+
+    uk_data = df_clean[
+        df_clean["Country"].str.strip().str.lower()
+        == "united kingdom"
+    ].copy()
+
+    # Remove non-product descriptions
+    uk_product_data = uk_data[
+        (~uk_data["Description"].str.contains(
+            "adjust|amazon|fee|manual|postage|discount|bank|bad debt",
+            case=False,
+            na=False
+        ))
+        &
+        (uk_data["Description"] != "Unknown")
+    ]
+
+    uk_products = (
+        uk_product_data
+        .groupby("Description")
+        .agg(
+            Revenue=("Revenue", "sum"),
+            Quantity=("Quantity", "sum"),
+            Orders=("Invoice", "nunique")
+        )
+        .sort_values("Revenue", ascending=False)
+    )
+
+    if not uk_products.empty:
+
+        uk_top_product = uk_products.iloc[0]
+        uk_top_product_name = uk_products.index[0]
+
+        uk_total_revenue = uk_data["Revenue"].sum()
+
+        uk_product_share = (
+            uk_top_product["Revenue"]
+            / uk_total_revenue
+            * 100
+        )
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.metric(
+                "🏆 Top Product",
+                uk_top_product_name
+            )
+
+        with col2:
+            st.metric(
+                "💰 Product Revenue",
+                f"£{uk_top_product['Revenue']:,.0f}"
+            )
+
+        with col3:
+            st.metric(
+                "📊 Share of UK Revenue",
+                f"{uk_product_share:.2f}%"
+            )
+
+        st.write(
+            f"""
+The highest-revenue product in the United Kingdom is
+**{uk_top_product_name}**.
+
+It generated **£{uk_top_product['Revenue']:,.0f}** from
+**{uk_top_product['Quantity']:,.0f} units sold**.
+"""
+        )
+
+        uk_top_10 = uk_products.head(10).reset_index()
+
+        st.subheader("🏆 Top 10 UK Products by Revenue")
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+        sns.barplot(
+            data=uk_top_10,
+            x="Revenue",
+            y="Description",
+            color="#1f77b4",
+            ax=ax
+        )
+
+        ax.set_title("Top 10 Products in the United Kingdom")
+        ax.set_xlabel("Revenue (£)")
+        ax.set_ylabel("Product")
+
+        fig.tight_layout()
+        st.pyplot(fig)
+
+        uk_top_10 = uk_top_10.rename(
+            columns={
+                "Description": "Product",
+                "Revenue": "Revenue (£)",
+                "Quantity": "Units Sold"
+            }
+        )
+
+        uk_top_10["Revenue (£)"] = (
+            uk_top_10["Revenue (£)"]
+            .round(0)
+            .astype(int)
+        )
+
+        st.dataframe(
+            uk_top_10[
+                ["Product", "Revenue (£)", "Units Sold", "Orders"]
+            ],
+            use_container_width=True
+        )
+
+    else:
+        st.warning(
+            "No United Kingdom product data was found."
+        )
+
+# --------------------------------------------------
+# SALES BY WEEKDAY
+# --------------------------------------------------
+
+with tab4:
+
+    st.subheader("📆 Sales by Weekday")
+
+    weekday_data = df_clean.copy()
+
+    weekday_data["Weekday"] = (
+        weekday_data["InvoiceDate"].dt.day_name()
+    )
+
+    weekday_order = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+    ]
+
+    weekday_summary = (
+        weekday_data
+        .groupby("Weekday")
+        .agg(
+            Revenue=("Revenue", "sum"),
+            Orders=("Invoice", "nunique"),
+            Quantity=("Quantity", "sum"),
+            Customers=("Customer ID", "nunique")
+        )
+        .reindex(weekday_order)
+        .fillna(0)
+        .reset_index()
+    )
+
+    weekday_summary["Average Order Value"] = np.where(
+        weekday_summary["Orders"] > 0,
+        weekday_summary["Revenue"]
+        / weekday_summary["Orders"],
+        0
+    )
+
+    best_weekday = weekday_summary.loc[
+        weekday_summary["Revenue"].idxmax()
+    ]
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            "🏆 Best Sales Day",
+            best_weekday["Weekday"]
+        )
+
+    with col2:
+        st.metric(
+            "💰 Revenue",
+            f"£{best_weekday['Revenue']:,.0f}"
+        )
+
+    with col3:
+        st.metric(
+            "🧾 Orders",
+            f"{best_weekday['Orders']:,.0f}"
+        )
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    sns.barplot(
+        data=weekday_summary,
+        x="Weekday",
+        y="Revenue",
+        color="#ff7f0e",
+        ax=ax
+    )
+
+    ax.set_title("Revenue by Day of the Week")
+    ax.set_xlabel("Day")
+    ax.set_ylabel("Revenue (£)")
+    ax.yaxis.set_major_formatter(
+    FuncFormatter(lambda value, position: f"£{value / 1_000_000:.1f}M")
+)
+    plt.xticks(rotation=30)
+
+    fig.tight_layout()
+    st.pyplot(fig)
+
+    st.subheader("📊 Weekday Performance Table")
+
+    weekday_display = weekday_summary.copy()
+
+    weekday_display["Revenue"] = (
+        weekday_display["Revenue"]
+        .round(0)
+        .astype(int)
+    )
+
+    weekday_display["Average Order Value"] = (
+        weekday_display["Average Order Value"]
+        .round(0)
+        .astype(int)
+    )
+
+    weekday_display["Orders"] = (
+        weekday_display["Orders"]
+        .astype(int)
+    )
+
+    weekday_display["Quantity"] = (
+        weekday_display["Quantity"]
+        .astype(int)
+    )
+
+    st.dataframe(
+        weekday_display,
+        use_container_width=True
+    )
+
+    # --------------------------------------------------
+    # WEEKDAY VS WEEKEND
+    # --------------------------------------------------
+
+    weekday_data["Day Type"] = np.where(
+        weekday_data["InvoiceDate"].dt.dayofweek >= 5,
+        "Weekend",
+        "Weekday"
+    )
+
+    day_type_summary = (
+        weekday_data
+        .groupby("Day Type")
+        .agg(
+            Revenue=("Revenue", "sum"),
+            Orders=("Invoice", "nunique")
+        )
+        .reset_index()
+    )
+
+    st.markdown("---")
+    st.subheader("🏢 Weekday vs Weekend")
+
+    col1, col2 = st.columns(2)
+
+    weekday_result = day_type_summary[
+        day_type_summary["Day Type"] == "Weekday"
+    ]
+
+    weekend_result = day_type_summary[
+        day_type_summary["Day Type"] == "Weekend"
+    ]
+
+    with col1:
+
+        if not weekday_result.empty:
+
+            weekday_revenue = (
+                weekday_result.iloc[0]["Revenue"]
+            )
+
+            weekday_orders = (
+                weekday_result.iloc[0]["Orders"]
+            )
+
+            st.metric(
+                "Weekday Revenue",
+                f"£{weekday_revenue:,.0f}"
+            )
+
+            st.write(
+                f"Orders: **{weekday_orders:,.0f}**"
+            )
+
+    with col2:
+
+        if not weekend_result.empty:
+
+            weekend_revenue = (
+                weekend_result.iloc[0]["Revenue"]
+            )
+
+            weekend_orders = (
+                weekend_result.iloc[0]["Orders"]
+            )
+
+            st.metric(
+                "Weekend Revenue",
+                f"£{weekend_revenue:,.0f}"
+            )
+
+            st.write(
+                f"Orders: **{weekend_orders:,.0f}**"
+            )
